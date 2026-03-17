@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOXERA - Comparador Inteligente</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="theme-color" content="#000000">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --bg: #000000; /* Fundo Preto Absoluto como na imagem do logo */
+    --card: #121212;
+    --input: #1a1a1a;
+    --accent: #00FFFF; /* Ciano Neon */
+    --accent-dim: #a2e9f0; /* Ciano Claro para texto */
+    --green: #22c55e;
+    --text: #ffffff;
+    --text-dim: #b0b0b0;
+    --danger: #ff4444;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 10px; /* Reduzido para mobile */
+    display: flex;
+    justify-content: center;
+}
+
+.container { width: 100%; max-width: 800px; padding-bottom: 50px; }
+
+/* --- HEADER --- */
+.header { text-align: center; margin-bottom: 25px; margin-top: 15px; }
+.logo-container { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    margin-bottom: 15px;
+    position: relative;
+}
+
+/* Estilo do Novo Escudo SVG Altamente Fiel */
+.logo-svg { 
+    width: 90px; /* Ajustado para impacto visual */
+    height: auto;
+    margin-bottom: 5px;
+}
+
+.text-voxera {
+    font-size: 48px; /* Ligeiramente maior */
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 6px; /* Espaçamento largo fiel */
+    /* Gradiente suave de branco para ciano claro */
+    background: linear-gradient(to bottom, #ffffff 50%, var(--accent-dim) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    /* Brilho neon suave no texto */
+    filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.6));
+    margin: 0;
+}
+
+.badge { background: rgba(0,255,255,0.1); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 12px; border: 1px solid var(--accent); display: inline-block; margin-bottom: 10px; }
+h1 { font-size: 1.2rem; margin: 5px 0; color: var(--text-dim); font-weight: 400;}
+
+/* --- SECTIONS --- */
+.section-title { display: flex; align-items: center; gap: 10px; font-weight: bold; margin: 25px 0 10px 0; font-size: 0.9rem; color: var(--accent); }
+.num { background: var(--accent); color: var(--bg); width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; }
+.card { background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,255,255,0.05); border: 1px solid rgba(0,255,255,0.1); }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+label { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 5px; font-weight: 600; }
+input { width: 100%; background: var(--input); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; color: white; box-sizing: border-box; font-family: 'Inter', sans-serif;}
+input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 5px var(--accent); }
+
+.t-options { display: flex; gap: 8px; margin-bottom: 15px; }
+.t-btn { flex: 1; background: transparent; border: 1px solid var(--text-dim); color: white; padding: 10px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; transition: 0.3s; font-family: 'Inter', sans-serif;}
+.t-btn.active { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 8px var(--accent); font-weight: bold; }
+
+.btn-add { background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 14px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 15px; font-size: 1rem; box-shadow: 0 0 8px var(--accent); font-family: 'Inter', sans-serif; transition: 0.2s;}
+.btn-add:active { transform: scale(0.98); box-shadow: 0 0 3px var(--accent); }
+.btn-secondary { background: transparent; border: 1px solid var(--text-dim); color: var(--text); padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; flex: 1; font-family: 'Inter', sans-serif;}
+
+.table-container { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: center; min-width: 300px;}
+th { text-align: center; color: var(--accent); font-size: 0.7rem; padding: 12px 5px; border-bottom: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; letter-spacing: 1px;}
+td { padding: 12px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+
+.del-btn { color: var(--danger); background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 0 5px;}
+.total-row { display: flex; justify-content: center; gap: 30px; padding: 20px 5px 10px 5px; font-weight: bold; color: var(--accent); font-size: 1.1rem; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px;}
+
+.calc-hint { font-size: 0.65rem; color: var(--accent); margin-top: 4px; display: block; height: 12px; font-style: italic;}
+.actions-bar { display: flex; gap: 10px; margin-top: 20px; }
+
+/* Novo campo de custo extra que aparece dinamicamente */
+#extraCostRow { display: none; margin-top: 15px; }
+
+@media (max-width: 600px) { 
+    .grid { grid-template-columns: 1fr; gap: 10px;} 
+    .text-voxera { font-size: 36px; letter-spacing: 4px;}
+    .logo-svg { width: 70px; }
+    .total-row { gap: 15px; font-size: 1rem;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <div class="logo-container">
+            <svg class="logo-svg" viewBox="0 0 100 115" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <defs>
+                    <linearGradient id="metalGradient_dark" x1="50%" y1="0%" x2="50%" y2="100%">
+                        <stop offset="0%" stop-color="#1a2530" />
+                        <stop offset="100%" stop-color="#0d1217" />
+                    </linearGradient>
+
+                    <linearGradient id="metalGradient_rim" x1="50%" y1="0%" x2="50%" y2="100%">
+                        <stop offset="0%" stop-color="#a2e9f0" />
+                        <stop offset="50%" stop-color="#ffffff" />
+                        <stop offset="100%" stop-color="#48d1cc" />
+                    </linearGradient>
+
+                    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
+                        <feMerge>
+                            <feMergeNode in="blur"/>
+                            <feMergeNode in="blur"/> <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                    
+                    <mask id="shieldMask">
+                        <path d="M50 0 L95 20 L95 65 C95 95, 50 115, 50 115 C50 115, 5 95, 5 65 L5 20 Z" fill="white" />
+                    </mask>
+                </defs>
+                
+                <path d="M50 0 L95 20 L95 65 C95 95, 50 115, 50 115 C50 115, 5 95, 5 65 L5 20 Z" fill="url(#metalGradient_dark)" stroke="url(#metalGradient_rim)" stroke-width="2"/>
+
+                <g mask="url(#shieldMask)" filter="url(#neonGlow)">
+                    <path d="M28 52 L45 68 L78 30 L85 36 L45 78 L22 58 Z" fill="#ffffff" />
+                    
+                    <path d="M15 30 L50 15 L85 30 L85 60 C85 80, 50 95, 50 95 C50 95, 15 80, 15 60 Z" fill="none" stroke="#00ffff" stroke-width="1.5" opacity="0.8"/>
+                </g>
+                
+                <circle cx="50" cy="68" r="2" fill="#ffffff" opacity="0.8">
+                    <animate attributeName="opacity" values="0.8;0.3;0.8" dur="4s" repeatCount="indefinite" />
+                </circle>
+            </svg>
+            <span class="text-voxera">VOXERA</span>
+        </div>
+        <div class="badge">Talão Digital & Comparador</div>
+        <h1>Poupança Inteligente</h1>
+    </div>
+
+    <div class="section-title"><div class="num">1</div> Lojas e Logística</div>
+    <div class="card">
+        <div class="grid">
+            <div><label>Loja A (Nome)</label><input id="lojaA" placeholder="Ex: Lidl" oninput="saveLogistics()"></div>
+            <div><label>Loja B (Nome)</label><input id="lojaB" placeholder="Ex: Continente" oninput="saveLogistics()"></div>
+            <div><label>Distância A (km - ida)</label><input id="distA" type="number" step="0.1" placeholder="2.5" oninput="saveLogistics()"></div>
+            <div><label>Distância B (km - ida)</label><input id="distB" type="number" step="0.1" placeholder="4.0" oninput="saveLogistics()"></div>
+        </div>
+        
+        <label style="margin-top:15px">Modo de Transporte</label>
+        <div class="t-options">
+            <button id="btn-carro" class="t-btn active" onclick="setT('carro')">Carro</button>
+            <button id="btn-bicicleta" class="t-btn" onclick="setT('bicicleta')">Bicicleta</button>
+            <button id="btn-taxi" class="t-btn" onclick="setT('taxi')">Uber/Taxi</button>
+        </div>
+        
+        <div id="carCostRow" class="grid">
+            <div><label>Combustível (€/L)</label><input id="precComb" type="number" step="0.001" oninput="saveLogistics()"></div>
+            <div><label>Consumo (L/100km)</label><input id="cons" type="number" step="0.1" oninput="saveLogistics()"></div>
+        </div>
+        
+        <div id="extraCostRow" class="grid">
+            <div><label>Custo Viagem Loja A (€ total)</label><input id="costExtraA" type="number" step="0.10" placeholder="0.00" oninput="saveLogistics()"></div>
+            <div><label>Custo Viagem Loja B (€ total)</label><input id="costExtraB" type="number" step="0.10" placeholder="0.00" oninput="saveLogistics()"></div>
+        </div>
+    </div>
+
+    <div class="section-title"><div class="num">2</div> Adicionar Produtos</div>
+    <div class="card">
+        <label>Nome do Produto</label>
+        <input id="pNome" placeholder="Ex: Detergente" style="margin-bottom:15px">
+        <div class="grid">
+            <div>
+                <label>Preço Loja A (€)</label>
+                <input id="pValA" placeholder="Ex: 2+1.50" oninput="liveCalc('pValA', 'hintA')">
+                <span id="hintA" class="calc-hint"></span>
+            </div>
+            <div>
+                <label>Preço Loja B (€)</label>
+                <input id="pValB" placeholder="Ex: 5-0.20" oninput="liveCalc('pValB', 'hintB')">
+                <span id="hintB" class="calc-hint"></span>
+            </div>
+        </div>
+        <div style="margin-top:15px; display:flex; justify-content:flex-start; gap:10px;">
+            <button id="btn-scanner" class="btn-secondary" style="border-color:var(--text-dim); color:var(--text-dim); opacity: 0.6;" onclick="alertScanner()">📷 Scanner Inteligente (Brevemente)</button>
+        </div>
+        <button class="btn-add" onclick="addP()">Adicionar à Lista</button>
+    </div>
+
+    <div class="section-title"><div class="num">3</div> Lista de Compras</div>
+    <div class="card">
+        <div class="table-container">
+            <table id="tabela">
+                <thead>
+                    <tr>
+                        <th style="text-align:left;">Produto</th>
+                        <th id="th-A">Loja A</th>
+                        <th id="th-B">Loja B</th>
+                        <th style="width:30px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+        <div class="total-row">
+            <span>A: <span id="sA">0.00€</span></span>
+            <span>B: <span id="sB">0.00€</span></span>
+        </div>
+        <div class="actions-bar">
+            <button class="btn-secondary" onclick="limparLista()">Limpar Lista</button>
+            <button class="btn-secondary" style="border-color:var(--danger); color:var(--danger)" onclick="apagarTudo()">Apagar Tudo</button>
+        </div>
+    </div>
+
+    <button class="btn-add" style="border-color: var(--green); color: var(--green); box-shadow: 0 0 8px rgba(34,197,94,0.5); margin-bottom: 15px; margin-top: 25px;" onclick="calcFinal()">Comparar Total com Viagem</button>
+    <button class="btn-secondary" style="width: 100%; border-color: #25D366; color: #25D366; font-weight: bold;" onclick="partilharWhatsApp()">Partilhar Talão Digital WhatsApp📱</button>
+
+    <div id="res" style="display:none; margin-top: 20px;" class="card"></div>
+</div>
+
+<script>
+// Inicialização de variáveis seguras
+let prods = [];
+try {
+    const storedProds = localStorage.getItem('voxera_prods');
+    prods = storedProds ? JSON.parse(storedProds) : [];
+} catch (e) { console.error("Erro ao carregar produtos:", e); prods = []; }
+
+let transporte = localStorage.getItem('v_transp') || 'carro';
+
+window.onload = () => {
+    loadLogistics();
+    renderTable();
+};
+
+// --- GESTÃO DE TRANSPORTE ---
+function setT(t) {
+    transporte = t;
+    localStorage.setItem('v_transp', t);
+    updateTransportUI();
+    saveLogistics(); // Guarda o estado
+}
+
+function updateTransportUI() {
+    document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`btn-${transporte}`).classList.add('active');
+    
+    const carRow = document.getElementById('carCostRow');
+    const extraRow = document.getElementById('extraCostRow');
+
+    if(transporte === 'carro') {
+        carRow.style.display = 'grid';
+        extraRow.style.display = 'none';
+    } else {
+        carRow.style.display = 'none';
+        extraRow.style.display = 'grid';
+        // Ajusta placeholders para Bicicleta (normalmente grátis) ou Táxi
+        const placeholderA = transporte === 'bicicleta' ? '0.00 (grátis)' : 'Ex: 5.50';
+        const placeholderB = transporte === 'bicicleta' ? '0.00 (grátis)' : 'Ex: 8.00';
+        document.getElementById('costExtraA').placeholder = placeholderA;
+        document.getElementById('costExtraB').placeholder = placeholderB;
+    }
+}
+
+// --- LOGÍSTICA (PERSISTÊNCIA) ---
+function saveLogistics() {
+    localStorage.setItem('v_nA', document.getElementById('lojaA').value);
+    localStorage.setItem('v_nB', document.getElementById('lojaB').value);
+    localStorage.setItem('v_dA', document.getElementById('distA').value);
+    localStorage.setItem('v_dB', document.getElementById('distB').value);
+    localStorage.setItem('v_pC', document.getElementById('precComb').value);
+    localStorage.setItem('v_cons', document.getElementById('cons').value);
+    localStorage.setItem('v_ceA', document.getElementById('costExtraA').value);
+    localStorage.setItem('v_ceB', document.getElementById('costExtraB').value);
+    updateTableHeaders();
+}
+
+function loadLogistics() {
+    document.getElementById('lojaA').value = localStorage.getItem('v_nA') || "";
+    document.getElementById('lojaB').value = localStorage.getItem('v_nB') || "";
+    document.getElementById('distA').value = localStorage.getItem('v_dA') || "";
+    document.getElementById('distB').value = localStorage.getItem('v_dB') || "";
+    document.getElementById('precComb').value = localStorage.getItem('v_pC') || "1.729";
+    document.getElementById('cons').value = localStorage.getItem('v_cons') || "6.5";
+    document.getElementById('costExtraA').value = localStorage.getItem('v_ceA') || "";
+    document.getElementById('costExtraB').value = localStorage.getItem('v_ceB') || "";
+    updateTransportUI();
+    updateTableHeaders();
+}
+
+function updateTableHeaders() {
+    const nomeA = document.getElementById('lojaA').value || "Loja A";
+    const nomeB = document.getElementById('lojaB').value || "Loja B";
+    document.getElementById('th-A').innerText = nomeA;
+    document.getElementById('th-B').innerText = nomeB;
+}
+
+// --- CÁLCULO DINÂMICO ---
+function liveCalc(inputId, hintId) {
+    let val = document.getElementById(inputId).value;
+    let hint = document.getElementById(hintId);
+    if(!val) { hint.innerText = ""; return; }
+    try {
+        // Substitui vírgulas por pontos e limpa caracteres perigosos
+        let cleanVal = val.replace(/,/g, '.').replace(/[^0-9.+\-*/()]/g, '');
+        if(/[+\-*/]/.test(cleanVal)) {
+            // Usa Function em vez de eval para ligeiramente mais segurança
+            let res = new Function(`return ${cleanVal}`)();
+            hint.innerText = (res && typeof res === 'number') ? "= " + res.toFixed(2) + "€" : "";
+        } else { hint.innerText = ""; }
+    } catch(e) { hint.innerText = "Erro calc"; }
+}
+
+// --- GESTÃO DE PRODUTOS ---
+function addP() {
+    const nomeInput = document.getElementById("pNome");
+    const valAInput = document.getElementById("pValA");
+    const valBInput = document.getElementById("pValB");
+
+    let n = nomeInput.value.trim() || "Produto sem nome";
+    let rawA = valAInput.value.replace(/,/g, '.').replace(/[^0-9.+\-*/()]/g, '');
+    let rawB = valBInput.value.replace(/,/g, '.').replace(/[^0-9.+\-*/()]/g, '');
+        
+    let vA = null, vB = null;
+
+    // Helper function para avaliar com segurança
+    const safeEval = (raw) => {
+        if(!raw) return null;
+        try {
+            let res = new Function(`return ${raw}`)();
+            return (typeof res === 'number' && isFinite(res)) ? res : null;
+        } catch(e) { return null; }
+    };
+
+    vA = safeEval(rawA);
+    vB = safeEval(rawB);
+
+    if(vA === null && vB === null) {
+        alert("Por favor, introduza um preço válido em pelo menos uma das lojas.");
+        return;
+    }
+
+    prods.push({ n, vA, vB });
+    saveAndRefresh();
+        
+    // Limpar campos
+    nomeInput.value = "";
+    valAInput.value = "";
+    valBInput.value = "";
+    document.getElementById("hintA").innerText = "";
+    document.getElementById("hintB").innerText = "";
+    nomeInput.focus();
+}
+
+function renderTable() {
+    let tbody = document.getElementById("tabela").querySelector('tbody');
+    tbody.innerHTML = "";
+    let tA = 0, tB = 0;
+
+    if(prods.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-dim); font-style:italic; padding:20px;">A lista está vazia.</td></tr>`;
+    } else {
+        prods.forEach((p, i) => {
+            tA += (p.vA || 0);
+            tB += (p.vB || 0);
+            let r = tbody.insertRow();
+            r.innerHTML = `
+                <td style="text-align:left; font-weight:600;">${p.n}</td>
+                <td>${p.vA !== null ? p.vA.toFixed(2)+'€' : '-'}</td>
+                <td>${p.vB !== null ? p.vB.toFixed(2)+'€' : '-'}</td>
+                <td><button class="del-btn" onclick="removeP(${i})" title="Remover">🗑️</button></td>
+            `;
+        });
+    }
+
+    document.getElementById("sA").innerText = tA.toFixed(2) + "€";
+    document.getElementById("sB").innerText = tB.toFixed(2) + "€";
+}
+
+function removeP(i) { prods.splice(i, 1); saveAndRefresh(); }
+function limparLista() { if(prods.length > 0 && confirm("Limpar apenas os produtos da lista?")) { prods = []; saveAndRefresh(); } }
+function apagarTudo() { if(confirm("Deseja apagar TODOS os dados (lojas, preços e lista) e reiniciar?")) { localStorage.clear(); location.reload(); } }
+function saveAndRefresh() { localStorage.setItem('voxera_prods', JSON.stringify(prods)); renderTable(); }
+
+// --- COMPARAÇÃO FINAL ---
+function calcFinal() {
+    if(prods.length === 0) { alert("Adicione produtos à lista antes de comparar."); return; }
+
+    const dA = parseFloat(document.getElementById("distA").value) || 0;
+    const dB = parseFloat(document.getElementById("distB").value) || 0;
+    
+    let custA = 0, custB = 0;
+    let infoTransp = "";
+
+    if(transporte === 'carro') {
+        const c = parseFloat(document.getElementById("cons").value) || 0;
+        const pC = parseFloat(document.getElementById("precComb").value) || 0;
+        // Cálculo ida e volta (dist * 2)
+        custA = (dA * 2) * (c/100) * pC;
+        custB = (dB * 2) * (c/100) * pC;
+        infoTransp = `Carro (${c}L/100km, ${pC.toFixed(3)}€/L)`;
+    } else {
+        // Custo direto introduzido pelo utilizador para Táxi ou Bicicleta Alugada
+        custA = parseFloat(document.getElementById("costExtraA").value) || 0;
+        custB = parseFloat(document.getElementById("costExtraB").value) || 0;
+        infoTransp = transporte.charAt(0).toUpperCase() + transporte.slice(1);
+    }
+
+    let sumA = prods.reduce((s,p)=>s+(p.vA||0),0);
+    let sumB = prods.reduce((s,p)=>s+(p.vB||0),0);
+    let totalA = sumA + custA;
+    let totalB = sumB + custB;
+
+    const nomeA = document.getElementById("lojaA").value || "Loja A";
+    const nomeB = document.getElementById("lojaB").value || "Loja B";
+
+    let resDiv = document.getElementById("res");
+    resDiv.style.display="block";
+    
+    let vencA = totalA < totalB;
+    let poupanca = Math.abs(totalA - totalB).toFixed(2);
+
+    resDiv.innerHTML = `
+        <h3 style="color:var(--accent); margin-top:0; text-align:center; text-transform:uppercase; letter-spacing:1px;">Resultado da Comparação</h3>
+        <p style="text-align:center; font-size:0.8rem; color:var(--text-dim); margin-bottom:15px;">Transporte: ${infoTransp}</p>
+        
+        <div style="display:flex; justify-content:space-around; gap:10px; margin-bottom:15px;">
+            <div style="text-align:center; flex:1; padding:10px; border-radius:8px; background:${vencA ? 'rgba(34,197,94,0.1)' : 'transparent'}; border:${vencA ? '1px solid var(--green)' : '1px solid rgba(255,255,255,0.1)'}">
+                <div style="font-size:0.8rem; color:var(--text-dim)">Total ${nomeA}</div>
+                <div style="font-size:1.3rem; font-weight:800; color:${vencA ? 'var(--green)' : 'white'}">${totalA.toFixed(2)}€</div>
+                <div style="font-size:0.7rem; color:var(--text-dim)">(${sumA.toFixed(2)}€ prods + ${custA.toFixed(2)}€ viagem)</div>
+            </div>
+            <div style="text-align:center; flex:1; padding:10px; border-radius:8px; background:${!vencA ? 'rgba(34,197,94,0.1)' : 'transparent'}; border:${!vencA ? '1px solid var(--green)' : '1px solid rgba(255,255,255,0.1)'}">
+                <div style="font-size:0.8rem; color:var(--text-dim)">Total ${nomeB}</div>
+                <div style="font-size:1.3rem; font-weight:800; color:${!vencA ? 'var(--green)' : 'white'}">${totalB.toFixed(2)}€</div>
+                <div style="font-size:0.7rem; color:var(--text-dim)">(${sumB.toFixed(2)}€ prods + ${custB.toFixed(2)}€ viagem)</div>
+            </div>
+        </div>
+
+        <hr style="border:0; border-top:1px solid rgba(0,255,255,0.2); margin:15px 0">
+        <p style="font-size:1.1rem; text-align:center; margin:0;">✅ Melhor opção: <b style="color:var(--accent)">${vencA ? nomeA : nomeB}</b></p>
+        <p style="font-size:1rem; text-align:center; color:var(--green); margin-top:5px; font-weight:600;">Poupas ${poupanca}€ no total</p>
+    `;
+    resDiv.scrollIntoView({behavior:"smooth"});
+}
+
+// --- PARTILHA WHATSAPP ---
+function partilharWhatsApp() {
+    if(prods.length === 0) { alert("A lista está vazia."); return; }
+    
+    let nA = document.getElementById("lojaA").value || "Loja A";
+    let nB = document.getElementById("lojaB").value || "Loja B";
+    let data = new Date().toLocaleDateString('pt-PT');
+    let texto = `🛒 *VOXERA - TALÃO DIGITAL* \n📅 ${data}\n\n`;
+
+    prods.forEach(p => {
+        texto += `🔹 *${p.n}*\n   ${nA}: ${p.vA ? p.vA.toFixed(2)+'€':'-'} | ${nB}: ${p.vB ? p.vB.toFixed(2)+'€':'-'}\n`;
+    });
+
+    let sA = document.getElementById("sA").innerText;
+    let sB = document.getElementById("sB").innerText;
+    texto += `\n💰 *TOTAIS PRODUTOS:*\n${nA}: ${sA}\n${nB}: ${sB}\n\n🤖 _Gerado por Voxera Poupança Inteligente_`;
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+}
+
+// --- NOVO AVISO DO SCANNER ---
+function alertScanner() {
+    alert("🚀 Funcionalidade em desenvolvimento! \n\nEstamos a trabalhar para que o VOXERA consiga ler talões reais usando Inteligência Artificial. \n\nPor agora, usa a introdução manual rápida. Obrigado pela paciência! 😉");
+}
+
+// --- SERVICE WORKER (Apenas funciona com ficheiro sw.js no servidor) ---
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js')
+    .then(()=>console.log('VOXERA: Offline Pronto!'))
+    .catch(err=>console.error('Erro SW (Ignore se não tiver o ficheiro sw.js):',err));
+}
+</script>
+</body>
+</html>
