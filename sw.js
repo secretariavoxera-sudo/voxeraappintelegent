@@ -1,9 +1,9 @@
-const CACHE_NAME = 'voxera-v3';
+const CACHE_NAME = 'voxera-v4';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon.png'
+  './icone.png'
 ];
 
 // Instala o Service Worker e guarda os ficheiros
