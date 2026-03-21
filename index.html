@@ -510,5 +510,48 @@ if('serviceWorker' in navigator){
     .catch(err=>console.error('Erro SW (Ignore se não tiver o ficheiro sw.js):',err));
 }
 </script>
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC-AG3hJZl-sxEcOuQWjhlrBkY__Cj3zgk",
+    authDomain: "voxeraintelegent.firebaseapp.com",
+    projectId: "voxeraintelegent",
+    storageBucket: "voxeraintelegent.firebasestorage.app",
+    messagingSenderId: "323072184525",
+    appId: "1:323072184525:web:70937b21246deb05cb9984"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  const loginBtn = document.getElementById('login-btn');
+  const userInfo = document.getElementById('user-info');
+  const userName = document.getElementById('user-name');
+
+  // Evento de clique para Login
+  if (loginBtn) {
+    loginBtn.addEventListener('click', () => {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          console.log("Utilizador autenticado!");
+        }).catch((error) => {
+          console.error("Erro no login:", error.message);
+        });
+    });
+  }
+
+  // Verificar estado do utilizador
+  onAuthStateChanged(auth, (user) => {
+    if (user && userInfo && loginBtn) {
+      loginBtn.style.display = 'none';
+      userInfo.style.display = 'block';
+      userName.textContent = user.displayName;
+    }
+  });
+</script>
+
 </body>
 </html>
