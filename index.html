@@ -557,14 +557,30 @@ if('serviceWorker' in navigator){
 
 
     
-<footer style="clear: both; display: block; width: 100%; text-align: center; padding: 40px 0; background: #0d1117; border-top: 1px solid #1a1a1a; margin-top: 50px;">
-    <p style="color: #888; font-size: 13px; margin-bottom: 10px;">&copy; 2026 Voxera - Logística Pessoal</p>
-    <div style="display: flex; justify-content: center; gap: 20px;">
-        <a href="privacidade.html" style="color: #00f2ff; text-decoration: none; font-size: 13px;">Privacidade</a>
+<footer style="
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(13, 17, 23, 0.95);
+    border-top: 1px solid #1a1a1a;
+    padding: 10px 0;
+    text-align: center;
+    z-index: 9999;
+    backdrop-filter: blur(5px);
+">
+    <div style="font-size: 11px; color: #888; margin-bottom: 5px;">
+        &copy; 2026 Voxera - Logística Pessoal
+    </div>
+    <div style="display: flex; justify-content: center; gap: 15px; font-size: 12px;">
+        <a href="privacidade.html" style="color: #00f2ff; text-decoration: none;">Privacidade</a>
         <span style="color: #333;">|</span>
-        <a href="termos.html" style="color: #00f2ff; text-decoration: none; font-size: 13px;">Termos</a>
+        <a href="termos.html" style="color: #00f2ff; text-decoration: none;">Termos</a>
     </div>
 </footer>
+
+<div style="height: 80px;"></div>
+
 
 
     
