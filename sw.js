@@ -1,4 +1,4 @@
-const CACHE_NAME = 'voxera-v14';
+const CACHE_NAME = 'voxera-v15';
 const ASSETS = [
   './',
   './index.html',
